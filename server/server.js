@@ -35,7 +35,7 @@ const PORT = process.env.PORT || 8888;
 app.use(cors())
    .use(cookieParser());
 
-app.get('/content', function(req, res) {
+app.get('/callback', function(req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
@@ -59,7 +59,7 @@ app.get('/', (req, res) => {
       // use the access token to access the Spotify Web API
       token = body.access_token;
 
-      res.redirect(redirect_uri + 'content#' +
+      res.redirect(redirect_uri + 'callback#' +
           querystring.stringify({
             access_token: body.access_token,
             refresh_token: body.refresh_token
