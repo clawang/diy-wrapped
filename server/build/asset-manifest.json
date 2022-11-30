@@ -1,0 +1,31 @@
+{
+  "files": {
+    "main.css": "/static/css/main.9ba1f20d.chunk.css",
+    "main.js": "/static/js/main.f568a0d6.chunk.js",
+    "main.js.map": "/static/js/main.f568a0d6.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.09b85ec0.js",
+    "runtime-main.js.map": "/static/js/runtime-main.09b85ec0.js.map",
+    "static/js/2.6f39ad0d.chunk.js": "/static/js/2.6f39ad0d.chunk.js",
+    "static/js/2.6f39ad0d.chunk.js.map": "/static/js/2.6f39ad0d.chunk.js.map",
+    "index.html": "/index.html",
+    "precache-manifest.fd86fe356500a2435ca28382b4c8e03e.js": "/precache-manifest.fd86fe356500a2435ca28382b4c8e03e.js",
+    "service-worker.js": "/service-worker.js",
+    "static/css/main.9ba1f20d.chunk.css.map": "/static/css/main.9ba1f20d.chunk.css.map",
+    "static/js/2.6f39ad0d.chunk.js.LICENSE.txt": "/static/js/2.6f39ad0d.chunk.js.LICENSE.txt",
+    "static/media/App.scss": "/static/media/CircularSpotifyTxT-Black.01173b24.ttf",
+    "static/media/gradient1.jpg": "/static/media/gradient1.d7a28196.jpg",
+    "static/media/gradient2.jpg": "/static/media/gradient2.f4d46500.jpg",
+    "static/media/gradient3.jpg": "/static/media/gradient3.a5e57412.jpg",
+    "static/media/gradient4.jpg": "/static/media/gradient4.5f015694.jpg",
+    "static/media/gradient5.png": "/static/media/gradient5.e2e75598.png",
+    "static/media/spotify1.JPG": "/static/media/spotify1.c7677681.JPG",
+    "static/media/spotify2.JPG": "/static/media/spotify2.0814b338.JPG",
+    "static/media/spotify3.JPG": "/static/media/spotify3.a63b63cb.JPG"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.09b85ec0.js",
+    "static/js/2.6f39ad0d.chunk.js",
+    "static/css/main.9ba1f20d.chunk.css",
+    "static/js/main.f568a0d6.chunk.js"
+  ]
+}
