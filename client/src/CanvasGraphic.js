@@ -52,28 +52,6 @@ const colorPalettes = [
 function CanvasGraphic(props) {
 	const [palette, setPalette] = useState(0);
 
-	//   useEffect(() => {
-	// 	loadFonts();
-	//   }, []);
-
-	//   const loadFonts = async () => {
-	// 	const font1 = new FontFace("Circular Black", "url(assets/CircularSpotifyTxT-Black.ttf)", {
-	// 	  style: "normal",
-	// 	  weight: "400",
-	// 	});
-
-	// 	const font2 = new FontFace("Circular", "url(assets/Circular-Book.ttf)", {
-	// 	  style: "normal",
-	// 	  weight: "400",
-	// 	});
-	// 	// wait for font to be loaded
-	// 	await font1.load();
-	// 	await font2.load();
-	// 	// add font to document
-	// 	document.fonts.add(font1);
-	// 	document.fonts.add(font2);
-	//   }
-
 	const getLines = (ctx, text, maxWidth) => {
 		var words = text.split(" ");
 		var lines = [];
