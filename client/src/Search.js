@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 
 function Search(props) {
 
@@ -17,15 +17,15 @@ function Search(props) {
 	}
 
 	const fetchData = () => {
-		if(props.tracks) {
+		if (props.tracks) {
 			props.spotifyApi.searchTracks(query).then((res) => {
-			  setResults(res.tracks.items);
-			  setSearched(true);
+				setResults(res.tracks.items);
+				setSearched(true);
 			});
 		} else {
 			props.spotifyApi.searchArtists(query).then((res) => {
-			  setResults(res.artists.items);
-			  setSearched(true);
+				setResults(res.artists.items);
+				setSearched(true);
 			});
 		}
 	}
@@ -33,27 +33,30 @@ function Search(props) {
 	return (
 		<div className="search">
 			<form className="search-form">
-	          <input type="text" value={query} placeholder={"Search " + (props.tracks ? "a track" : "an artist")} onChange={handleChange} />
-	          <button onClick={handleSubmit}>
-	          	<img src="./search.png" />
-	          </button>
-	        </form>
-	        {
-	        	results.length > 0 ?
-			        <div className="results">
-			        	{results.map(track => props.tracks ? <SearchTrackResult data={track} setEntityData={props.setData} /> : <SearchArtistResult data={track} setEntityData={props.setData} />)}
-			      	</div>
-		      	:
-		      		(
-		      			searched ?
-			      			<div className="results">
-			      				<p>There were no results for your query.</p>
-			      			</div>
-		      			:
-		      				<></>
-		      		)
-		    }
-      	</div>
+				<div className="search-bar-wrapper">
+					<input type="text" value={query} placeholder={"Search " + (props.tracks ? "a track" : "an artist")} onChange={handleChange} />
+					{
+						results.length > 0 ?
+							<div className="results">
+								{results.map(track => props.tracks ? <SearchTrackResult data={track} setEntityData={props.setData} /> : <SearchArtistResult data={track} setEntityData={props.setData} />)}
+							</div>
+							:
+							(
+								searched ?
+									<div className="results">
+										<p>There were no results for your query.</p>
+									</div>
+									:
+									<></>
+							)
+					}
+				</div>
+				<button onClick={handleSubmit}>
+					<img src="./search.png" />
+				</button>
+			</form>
+
+		</div>
 	);
 }
 

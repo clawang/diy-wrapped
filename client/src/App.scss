@@ -6,22 +6,17 @@ $body-font: 'Anonymous Pro', 'Courier New';
 
 @font-face {
   font-family: Circular Spotify;
-  src: url('CircularSpotifyTxT-Black.ttf');
+  src: url('assets/CircularSpotifyTxT-Black.ttf');
 }
 
 @font-face {
   font-family: Circular Book;
-  src: url('Circular Book.ttf');
-}
-
-@font-face {
-  font-family: Corrupted File;
-  src: url('Corrupted File.ttf');
+  src: url('assets/Circular Book.ttf');
 }
 
 @font-face {
   font-family: Anonymous Pro;
-  src: url('AnonymousPro-Regular.ttf');
+  src: url('assets/AnonymousPro-Regular.ttf');
 }
 
 html {
@@ -36,14 +31,17 @@ body {
   height: auto;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   margin: 0.3em 0;
 }
 
 h1 {
   font-size: 5em;
   margin: 0.5em 0;
-  font-family: 'Corrupted File', 'Helvetica', sans-serif;
+  font-family: 'Helvetica', sans-serif;
 }
 
 h2 {
@@ -54,7 +52,8 @@ h3 {
   font-size: 1.5em;
 }
 
-h2, h3 {
+h2,
+h3 {
   letter-spacing: -.02em;
   font-weight: 900;
   font-family: 'Circular Spotify', 'Helvetica', sans-serif;
@@ -68,16 +67,12 @@ div {
   box-sizing: border-box;
 }
 
-form {
-  
-}
-
 a {
   color: $pink;
 }
 
 button {
-  margin: 10px;
+  margin: 15px 0;
   background: white;
   border: 1px solid black;
   padding: 1em 2em;
@@ -102,20 +97,52 @@ button {
   }
 }
 
-.App {
-  text-align:center;
+input[type="text"] {
+  font-family: $body-font, monospace;
+  border-radius: 0;
+  border: 1px solid black;
+  padding: 5px;
 }
 
-.selections-wrapper {
-  display: flex;
+.App {
+  // text-align:center;
+}
+
+.start-container {
   width: 100%;
-  max-width: 800px;
-  margin: 50px auto;
-  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100px 0;
+
+  h1 {
+    margin: 0;
+    font-family: $body-font, monospace;
+  }
+}
+
+.container {
+  display: flex;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  // justify-content: center;
+  border-right: 1px dashed black;
+  padding: 20px 50px;
+  height: 100vh;
+  overflow-y: scroll;
 }
 
 .selections {
-  margin: 20px 40px;
+  margin: 10px 0px;
+  width: 100%;
+
+  input[type="text"] {
+    width: 100%;
+  }
 
   h2 {
     font-family: $body-font, monospace;
@@ -124,9 +151,8 @@ button {
 
 .entity-wrapper {
   width: 100%;
-  height: 40px;
   display: flex;
-  align-items:center;
+  padding: 5px 0;
   //border: 1px solid red;
 
   .change-link {
@@ -141,12 +167,14 @@ button {
 }
 
 .search {
-  position:relative;
+  position: relative;
+  width: 100%;
 
   input[type="text"] {
-    width: 200px;
+    width: 100%;
     font-family: $body-font, monospace;
     font-size: 16px;
+    box-sizing: border-box;
   }
 
   button {
@@ -168,13 +196,18 @@ button {
     display: flex;
     align-items: center;
   }
+
+  .search-bar-wrapper {
+    width: 100%;
+    position: relative;
+  }
 }
 
 .results {
   position: absolute;
-  width: 500px;
+  width: 100%;
   max-width: 100%;
-  max-height: 100vh;
+  max-height: 200px;
   overflow-y: scroll;
   border: 1px solid black;
   z-index: 5;
@@ -191,7 +224,7 @@ button {
   border-bottom: 1px solid black;
   cursor: pointer;
   transition: 0.2s;
-  align-items:center;
+  align-items: center;
   text-align: left;
 
   &:hover {
@@ -246,7 +279,9 @@ button {
   button {
     background: white;
 
-    &:hover {background: black}
+    &:hover {
+      background: black
+    }
   }
 }
 
@@ -258,14 +293,17 @@ button {
   text-align: left;
   display: flex;
   align-items: center;
-  width: 100%;
-  padding: 60px 0;
+  justify-content: center;
+  flex-direction: column;
+  width: 50%;
+  padding: 20px;
 
   .graphics-wrapper {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-    }
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
 
   .canvas-title {
     width: 400px;
@@ -293,12 +331,48 @@ button {
   }
 
   button {
-    background: $black;
-    color: $green;
-    margin-top: 2em;
+    font-size: 14px;
   }
 }
 
 .invisible {
   display: none;
+}
+
+.color-selector {
+  display: flex;
+  margin: 20px 0;
+  flex-grow: 0;
+  flex-shrink: 0;
+
+  .color {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin: 3px;
+    cursor: pointer;
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    &.selected {
+      border: 1px solid black;
+    }
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .input-container {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px dashed black;
+    height: auto;
+  }
+
+  .canvas-graphic-wrapper {
+    width: 100%;
+  }
 }

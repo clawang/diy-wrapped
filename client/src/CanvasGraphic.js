@@ -1,425 +1,226 @@
-import React, {useEffect, useState} from 'react';
-import Vibrant from 'node-vibrant';
-import gradient1 from './gradient1.jpg';
-import gradient2 from './gradient2.jpg';
-import gradient3 from './gradient3.jpg';
-import gradient4 from './gradient4.jpg';
-import gradient5 from './gradient5.png';
-import spotify1 from './spotify1.JPG';
-import spotify2 from './spotify2.JPG';
-import spotify3 from './spotify3.JPG';
+import React, { useEffect, useState } from 'react';
+import bgPurple from './assets/2023-purple.png';
+import bgLavender from './assets/2023-lavender.png';
+import bgYellow from './assets/2023-yellow.png';
+import bgRed from './assets/2023-red.png';
+import bgBlack from './assets/2023-black.png';
+import bgGreen from './assets/2023-green.png';
+
+const FONT_FAMILY = 'Circular Spotify';
+const purple = 'rgb(65,0,118)';
+const lavender = 'rgb(176, 178, 255)';
+const yellow = 'rgb(218, 181, 5)';
+const red = 'rgb(254, 91, 72)';
+const dark = 'rgb(1,1,1)';
+const green = 'rgb(22,209,166)';
+const white = 'rgb(255,255,255)';
+const black = 'rgba(0,0,0,0.9)';
+
+const colorPalettes = [
+	{
+		textColor: black,
+		bg: bgLavender,
+		color: lavender
+	},
+	{
+		textColor: black,
+		bg: bgYellow,
+		color: yellow
+	},
+	{
+		textColor: black,
+		bg: bgRed,
+		color: red,
+	},
+	{
+		textColor: white,
+		bg: bgBlack,
+		color: dark,
+	},
+	{
+		textColor: black,
+		bg: bgGreen,
+		color: green,
+	},
+	{
+		textColor: white,
+		bg: bgPurple,
+		color: purple,
+	}
+];
 
 function CanvasGraphic(props) {
-  const [appState, setAppState] = useState({
-    palette: {}
-  });
+	const [palette, setPalette] = useState(0);
 
-  const shortenString = (text, remove) => {
-  	let index = text.indexOf('(');
-  	if(index > 0) return text.substring(0, index);
-		return text.substring(0, text.length-remove).concat('..');
+	//   useEffect(() => {
+	// 	loadFonts();
+	//   }, []);
+
+	//   const loadFonts = async () => {
+	// 	const font1 = new FontFace("Circular Black", "url(assets/CircularSpotifyTxT-Black.ttf)", {
+	// 	  style: "normal",
+	// 	  weight: "400",
+	// 	});
+
+	// 	const font2 = new FontFace("Circular", "url(assets/Circular-Book.ttf)", {
+	// 	  style: "normal",
+	// 	  weight: "400",
+	// 	});
+	// 	// wait for font to be loaded
+	// 	await font1.load();
+	// 	await font2.load();
+	// 	// add font to document
+	// 	document.fonts.add(font1);
+	// 	document.fonts.add(font2);
+	//   }
+
+	const getLines = (ctx, text, maxWidth) => {
+		var words = text.split(" ");
+		var lines = [];
+		var currentLine = words[0];
+
+		for (var i = 1; i < words.length; i++) {
+			var word = words[i];
+			var width = ctx.measureText(currentLine + " " + word).width;
+			if (width < maxWidth) {
+				currentLine += " " + word;
+			} else {
+				lines.push(currentLine);
+				currentLine = word;
+			}
+		}
+		lines.push(currentLine);
+		return lines;
 	}
 
-  const getColor = () => {
-  	let src = '';
-  	if(props.data.tracks) {
-			src = props.data.artists[0].images[0].url || '';
+	const shortenString = (ctx, text, maxWidth) => {
+		let metrics = ctx.measureText(text);
+		let width = metrics.width;
+		if (width > maxWidth) {
+			let ratio = width / text.length;
+			let removeCount = Math.ceil((width - maxWidth) / ratio);
+			let index = text.indexOf('(');
+			if (index > 0) return text.substring(0, index);
+			return text.substring(0, text.length - removeCount).concat('...');
+		} else {
+			return text;
 		}
-  	Vibrant.from(src).getPalette(function(err, palette) {
-  		console.log(palette);
-			if(palette) {
-				setAppState({palette: palette});
-				//drawSquareCanvas(palette);
-				drawSongsCanvas();
-				drawStoryCanvas();
-				drawArtistsCanvas();
+	}
+
+	const drawStoryCanvas = async () => {
+		let ratio = window.devicePixelRatio;
+		const w = 450;
+		const h = 800;
+		const cv = document.getElementById("story");
+		cv.width = w * ratio;
+		cv.height = h * ratio;
+		// cv.style.width = w + "px";
+		// cv.style.height = h + "px";
+		const ctx = cv.getContext("2d");
+		ctx.scale(ratio, ratio);
+
+		const startingHeight = 108;
+		await drawImage(ctx, props.data.artists[0].images[1].url, 102, startingHeight - 22, 247, 247);
+		await drawImage(ctx, colorPalettes[palette].bg, 0, 0, w, h); //background
+
+		ctx.fillStyle = colorPalettes[palette].textColor;
+		ctx.font = `20px '${FONT_FAMILY}'`;
+
+		const maxWidth = 140;
+		for (let i = 0; i < 5; i++) {
+			if (props.data.artists[i] && Object.keys(props.data.artists[i]).length != 0) {
+				let name = props.data.artists[i].name;
+				name = shortenString(ctx, name, maxWidth);
+				writeText(ctx, name, 55, startingHeight + 385 + i * 27.5);
+			}
+		}
+
+		ctx.font = `20px '${FONT_FAMILY}'`;
+		for (let i = 0; i < 5; i++) {
+			if (props.data.tracks[i]) {
+				let name = props.data.tracks[i].name;
+				name = shortenString(ctx, name, maxWidth);
+				writeText(ctx, name, 260, startingHeight + 385 + i * 27.5);
+			}
+		}
+
+		if (props.data.genre) {
+			let g = props.data.genre;
+			let topGenre = g.charAt(0).toUpperCase() + g.slice(1);
+			const lines = getLines(ctx, topGenre, maxWidth);
+			ctx.font = `30px '${FONT_FAMILY}'`;
+			for (let i = 0; i < 2; i++) {
+				if (i > lines.length - 1) break;
+				if (i === 1) {
+					writeText(ctx, shortenString(ctx, lines[i], maxWidth), 240, startingHeight + (580 + i * 42));
+				} else {
+					writeText(ctx, lines[i], 240, startingHeight + (580 + i * 42));
+				}
+			}
+		}
+
+		if (props.data.time) {
+			let time = props.data.time;
+			ctx.font = `30px '${FONT_FAMILY}'`;
+			writeText(ctx, time, 30, startingHeight + 580);
+		}
+	}
+
+	const writeText = (ctx, words, x, y) => {
+		ctx.fillText(words, x, y);
+	}
+
+	const drawImage = (ctx, src, x, y, width, height) => {
+		return new Promise((resolve, reject) => {
+			const image = new Image();
+			image.crossOrigin = 'Anonymous';
+			image.src = src;
+			image.onload = () => {
+				ctx.drawImage(image, x, y, width, height);
+				resolve();
 			}
 		});
-  }
+	}
 
-  const drawStoryCanvas = async () => {
-  	let ratio = window.devicePixelRatio;
-  	console.log(ratio);
-  	const w = 450;
-  	const h = 800;
-  	const cv = document.getElementById("story");
-  	cv.width = w * ratio;
-    cv.height = h * ratio;
-    // cv.style.width = w + "px";
-    // cv.style.height = h + "px";
-  	const ctx = cv.getContext("2d");
-  	ctx.scale(ratio, ratio);
+	const dlCanvas = () => {
+		let canvas = document.getElementById("story");
+		let dt = canvas.toDataURL('image/png');
+		/* Change MIME type to trick the browser to downlaod the file instead of displaying it */
+		dt = dt.replace(/^data:image\/[^;]*/, 'data:application/octet-stream');
 
-  	//ctx.fillStyle = 'rgb(0,0,0)';
-  	//ctx.fillRect(0, 0, c.width, c.height);
-  	await drawImage(ctx, gradient4, 0, 0, cv.width, cv.height);
-  	const startingHeight = 120;
+		/* In addition to <a>'s "download" attribute, you can define HTTP-style headers */
+		dt = dt.replace(/^data:application\/octet-stream/, 'data:application/octet-stream;headers=Content-Disposition%3A%20attachment%3B%20filename=Canvas.png');
+		var link = document.createElement('a');
+		link.download = 'diy-wrapped.png';
+		link.href = dt;
+		link.click();
+	}
 
-  	const blue = 'rgb(0,0,0)';
-  	const purple = 'rgb(177,197,252)';
-  	const orange = 'rgb(247,210,201)';
+	useEffect(() => {
+		if (props.data && props.done) {
+			drawStoryCanvas();
+		}
+	}, [props.done, palette]);
 
-  	ctx.fillStyle = blue;
-  	ctx.fillRect(50, 75, 350, 650);
-  	await drawImage(ctx, gradient3, 75, startingHeight + 25, 300, 200);
-  	await drawImage(ctx, props.data.artists[0].images[1].url, 100, startingHeight, 250, 250);
-
-  	ctx.fillStyle = 'rgb(255,255,255)';
-  	ctx.font = "16px 'Circular'";
-  	ctx.fillText('TOP ARTISTS', 70, startingHeight + 300);
-  	ctx.font = "14px 'Circular'";
-  	for(let i = 0; i < 5; i++) {
-  		if(props.data.artists[i] && Object.keys(props.data.artists[i]).length != 0) {
-  			let name = props.data.artists[i].name;
-  			let metrics = ctx.measureText(name);
-  			let width = metrics.width;
-  			if(width > 200) {
-  				let ratio = width/name.length;
-  				let toRemove = Math.ceil((width-200)/ratio);
-  				name = shortenString(name, toRemove+1);
-  			}
-  			ctx.fillStyle = purple;
-  			writeText(ctx, name, 85, startingHeight + 325 + i * 18);
-  			ctx.fillStyle = 'rgb(255,255,255)';
-  			writeText(ctx, i+1, 70, startingHeight + 325 + i * 18);
-  		}
-  	}
-
-  	ctx.font = "16px 'Circular'";
-  	ctx.fillText('TOP SONGS', 230, startingHeight + 300);
-  	ctx.font = "14px 'Circular'";
-  	for(let i = 0; i < 5; i++) {
-  		if(props.data.tracks[i]) {
-  			let name = props.data.tracks[i].name;
-  			let metrics = ctx.measureText(name);
-  			let width = metrics.width;
-  			if(width > 100) {
-  				let ratio = width/name.length;
-  				let toRemove = Math.ceil((width-100)/ratio);
-  				name = shortenString(name, toRemove+1);
-  			}
-  			ctx.fillStyle = purple;
-  			writeText(ctx, name, 245, startingHeight + 325 + i * 18);
-  			ctx.fillStyle = 'rgb(255,255,255)';
-  			writeText(ctx, i+1, 230, startingHeight + 325 + i * 18);
-  		}
-  	}
-
-		ctx.fillStyle = 'rgb(255,255,255)';
-  	ctx.font = "16px 'Circular'";
-  	ctx.fillText('TOP GENRE', 70, startingHeight + 470);
-  	ctx.fillStyle = purple;
-  	ctx.font = "32px 'Circular'";
-  	if(props.genre) {
-  		let g = props.genre;
-  		let topGenre = g.charAt(0).toUpperCase() + g.slice(1);
-  		writeText(ctx, topGenre, 70, startingHeight + 510);
-  	}
-
-  	const footerHeight = 50;
-  	ctx.fillStyle = orange;
-  	ctx.fillRect(50, 625 + footerHeight, 350, footerHeight);
-  	ctx.fillStyle = blue;
-  	ctx.font = "18px 'Circular'";
-  	ctx.textAlign = 'center';
-  	writeText(ctx, 'bit.ly/quarantine-wrapped', 225, startingHeight + 550 + footerHeight/2 + 8);
-  }
-
-  const drawArtistsCanvas = async () => {
-  	let ratio = window.devicePixelRatio;
-  	const w = 450;
-  	const h = 800;
-  	const c = document.getElementById("artists");
-  	c.width = w * ratio;
-    c.height = h * ratio;
-  	const ctx = c.getContext("2d");
-  	ctx.scale(ratio, ratio);
-
-  	const purple = 'rgb(229,187,241)';
-  	const yellow = 'rgb(239,210,10)';
-  	const pink = 'rgb(226,28,164)';
-
-  	ctx.fillStyle = 'rgb(255,255,255)';
-  	ctx.fillRect(0, 0, c.width, c.height);
-
-	  await drawImage(ctx, gradient5, 0, 0, 450, 800);
-
-	  ctx.fillStyle = pink;
-  	ctx.fillRect(50, 75, 350, 650);
-
-  	ctx.font = "32px 'Circular'";
-  	ctx.fillStyle = 'rgb(255,255,255)';
-  	ctx.textAlign = 'center';
-  	writeText(ctx, 'My Top Artists', 225, 150);
-
-  	const startingHeight = 180;
-  	const startX = 85;
-  	ctx.textAlign = 'left';
-  	for(let i = 0; i < 5; i++) {
-  		if(props.data.artists[i]) {
-  			await drawImage(ctx, props.data.artists[i].images[1].url, startX, startingHeight + i * 100, 90, 90);
-  			ctx.font = "18px 'Circular'";
-  			ctx.fillStyle = yellow;
-  			writeText(ctx, "#"+(i+1), startX + 105, startingHeight + 35 + i*100);
-  			ctx.fillStyle = 'rgb(255,255,255)';
-  			let name = props.data.artists[i].name;
-  			let metrics = ctx.measureText(name);
-  			let width = metrics.width;
-  			
-  			const maxWidth = 180;
-  			if(width > maxWidth) {
-  				let ratio = width/name.length;
-  				let toRemove = Math.ceil((width-maxWidth)/ratio);
-  				name = shortenString(name, toRemove+1);
-  			}
-  			ctx.font = "22px 'Circular'";
-  			writeText(ctx, name, startX + 105, startingHeight + 65 + i * 100);
-  		}
-  	}
-  }
-
-  const drawSongsCanvas = async () => {
-  	let ratio = window.devicePixelRatio;
-  	const w = 450;
-  	const h = 800;
-  	const c = document.getElementById("songs");
-  	c.width = w * ratio;
-    c.height = h * ratio;
-    // c.style.width = w + "px";
-    // c.style.height = h + "px";
-  	const ctx = c.getContext("2d");
-  	ctx.scale(ratio, ratio);
-
-  	const orange = 'rgb(226,139,5)';
-  	const yellow = 'rgb(228,203,46)';
-  	const darkOrange = 'rgb(205,38,2)';
-  	const blue = 'rgb(0,196,230)';
-
-  	ctx.fillStyle = 'rgb(255,255,255)';
-  	ctx.fillRect(0, 0, c.width, c.height);
-
-	  await drawImage(ctx, gradient1, 0, 0, 450, 800);
-
-	  ctx.fillStyle = yellow;
-  	ctx.fillRect(50, 75, 350, 650);
-
-  	ctx.font = "32px 'Circular'";
-  	ctx.fillStyle = 'rgb(0,0,0)';
-  	ctx.textAlign = 'center';
-  	writeText(ctx, 'My Top Songs', 225, 150);
-
-  	const startingHeight = 180;
-  	const startX = 85;
-  	ctx.textAlign = 'left';
-  	for(let i = 0; i < 5; i++) {
-  		if(props.data.tracks[i]) {
-  			await drawImage(ctx, props.data.tracks[i].album.images[1].url, startX, startingHeight + i * 100, 90, 90);
-  			ctx.font = "18px 'Circular'";
-  			ctx.fillStyle = blue;
-  			writeText(ctx, "#"+(i+1), startX + 105, startingHeight + 30 + i*100);
-  			ctx.fillStyle = 'rgb(0,0,0)';
-  			let name = props.data.tracks[i].name;
-  			let metrics = ctx.measureText(name);
-  			let width = metrics.width;
-  			
-  			const maxWidth = 180;
-  			if(width > maxWidth) {
-  				let ratio = width/name.length;
-  				let toRemove = Math.ceil((width-maxWidth)/ratio);
-  				name = shortenString(name, toRemove+1);
-  			}
-  			writeText(ctx, name, startX + 105, startingHeight + 52 + i * 100);
-
-  			ctx.font = "16px 'Circular'";
-  			ctx.fillStyle = darkOrange;
-  			writeText(ctx, props.data.tracks[i].artists[0].name, startX + 105, startingHeight + 75 + i * 100);
-  		}
-  	}
-  }
-
-  const drawSquareCanvas = (palette) => {
-  	let c = document.getElementById("downloadable");
-  	c.width = c.clientWidth * 2
-  	c.height = c.clientHeight * 2
-  	let ctx = c.getContext("2d");
-  	if(window.innerWidth < 600) {
-  		ctx.scale(1.4, 1.4);
-  	} else {
-  		ctx.scale(2, 2);
-  	}
-
-  	if(palette.DarkMuted) {
-  		const bgColor = palette.DarkMuted.getRgb();
-  		ctx.fillStyle = 'rgb(' + bgColor[0] + ',' + bgColor[1] + ',' + bgColor[2] + ')';
-  	} else {
-  		ctx.fillStyle = 'rgb(0,0,0)';
-  	}
-  	ctx.fillRect(0, 0, c.width, c.height);
-
-  	ctx.fillStyle = 'rgb(255,255,255)';
-  	ctx.font = "16px 'Circular Spotify'";
-
-  	if(palette.Vibrant) {
-  		const bgColor = palette.Vibrant.getRgb();
-  		ctx.fillStyle = 'rgb(' + bgColor[0] + ',' + bgColor[1] + ',' + bgColor[2] + ')';
-  	} else {
-  		ctx.fillStyle = 'rgb(226,28,164)';
-  	}
-  	ctx.fillText('QUARANTINE WRAPPED', 270, 50);
-  	ctx.fillRect(30, 43, 230, 3);
-
-  	const image = new Image();
-  	image.crossOrigin = 'Anonymous';
-  	if(props.data.tracks) {
-  		image.src = props.data.artists[0].images[0].url || '';
-  	}
-
-  	image.onload = () => {
-  		if(image.naturalWidth < image.naturalHeight) {
-  			const diff = (image.naturalHeight - image.naturalWidth) / 2;
-  			ctx.drawImage(image, 0, diff, image.naturalWidth, image.naturalWidth, 290, 90, 140, 140);
-  			ctx.drawImage(image, 0, diff, image.naturalWidth, image.naturalWidth, 280, 105, 160, 160);
-  			ctx.drawImage(image, 0, diff, image.naturalWidth, image.naturalWidth, 265, 125, 190, 190);
-  			ctx.drawImage(image, 0, diff, image.naturalWidth, image.naturalWidth, 250, 150, 220, 220);
-  		} else if(image.naturalWidth > image.naturalHeight) {
-  			const diff = (image.naturalWidth - image.naturalHeight) / 2;
-  			ctx.drawImage(image, diff, 0, image.naturalHeight, image.naturalHeight, 290, 90, 140, 140);
-  			ctx.drawImage(image, diff, 0, image.naturalHeight, image.naturalHeight, 280, 105, 160, 160);
-  			ctx.drawImage(image, diff, 0, image.naturalHeight, image.naturalHeight, 265, 125, 190, 190);
-  			ctx.drawImage(image, diff, 0, image.naturalHeight, image.naturalHeight, 250, 150, 220, 220);
-  		} else {
-  			ctx.drawImage(image, 290, 90, 140, 140);
-  			ctx.drawImage(image, 280, 105, 160, 160);
-  			ctx.drawImage(image, 265, 125, 190, 190);
-  			ctx.drawImage(image, 250, 150, 220, 220);
-  		}
-  	};
-
-  	if(palette.LightVibrant) {
-  		const bgColor = palette.LightVibrant.getRgb();
-  		ctx.fillStyle = 'rgb(' + bgColor[0] + ',' + bgColor[1] + ',' + bgColor[2] + ')';
-  	} else {
-  		ctx.fillStyle = 'rgb(209,255,106)';
-  	}
-
-  	ctx.font = "18px 'Circular Spotify'";
-  	ctx.fillText('TOP ARTISTS', 30, 106);
-  	ctx.fillStyle = 'rgb(255,255,255)';
-  	ctx.font = "20px 'Circular Spotify'";
-
-  	for(let i = 0; i < 5; i++) {
-  		if(props.data.artists[i] && Object.keys(props.data.artists[i]).length != 0) {
-  			let name = props.data.artists[i].name;
-  			let metrics = ctx.measureText(name);
-  			let width = metrics.width;
-  			if(width > 200) {
-  				let ratio = width/name.length;
-  				let toRemove = Math.ceil((width-200)/ratio);
-  				name = shortenString(name, toRemove+1);
-  			}
-  			writeText(ctx, name, 30, 133 + i * 28);
-  		}
-  	}
-
-  	if(palette.LightVibrant) {
-  		const bgColor = palette.LightVibrant.getRgb();
-  		ctx.fillStyle = 'rgb(' + bgColor[0] + ',' + bgColor[1] + ',' + bgColor[2] + ')';
-  	} else {
-  		ctx.fillStyle = 'rgb(209,255,106)';
-  	}
-
-  	ctx.font = "18px 'Circular Spotify'";
-  	writeText(ctx, 'TOP SONGS', 30, 320);
-  	ctx.fillStyle = 'rgb(255,255,255)';
-  	ctx.font = "20px 'Circular Spotify'";
-
-  	for(let i = 0; i < 5; i++) {
-  		if(props.data.tracks[i]) {
-  			let name = props.data.tracks[i].name;
-  			let metrics = ctx.measureText(name);
-  			let width = metrics.width;
-  			if(width > 200) {
-  				let ratio = width/name.length;
-  				let toRemove = Math.ceil((width-200)/ratio);
-  				name = shortenString(name, toRemove+1);
-  			}
-  			writeText(ctx, name, 30, 348 + i * 28);
-  		}
-  	}
-
-  	if(palette.LightVibrant) {
-  		const bgColor = palette.LightVibrant.getRgb();
-  		ctx.fillStyle = 'rgb(' + bgColor[0] + ',' + bgColor[1] + ',' + bgColor[2] + ')';
-  	} else {
-  		ctx.fillStyle = 'rgb(209,255,106)';
-  	}
-  	ctx.font = "18px 'Circular Spotify'";
-  	writeText(ctx, 'TOP GENRE', 250, 430);
-  	ctx.fillStyle = 'rgb(255,255,255)';
-  	ctx.font = "24px 'Circular Spotify'";
-  	if(props.genre) {
-  		let g = props.genre;
-  		let topGenre = g.charAt(0).toUpperCase() + g.slice(1);
-  		writeText(ctx, topGenre, 250, 460);
-  	}
-
-  	if(palette.DarkVibrant) {
-  		const bgColor = palette.DarkVibrant.getRgb();
-  		ctx.fillStyle = 'rgba(' + bgColor[0] + ',' + bgColor[1] + ',' + bgColor[2] + ', 50)';
-  	} else {
-  		ctx.fillStyle = 'rgb(255,255,255,50)';
-  	}
-  	ctx.font = "12px 'Circular Spotify'";
-  	writeText(ctx, 'bit.ly/quarantine-wrapped', 305, 66);
-  }
-
-  const writeText = (ctx, words, x, y) => {
-  	ctx.fillText(words, x, y);
-  }
-
-  const drawImage = (ctx, src, x, y, width, height) => {
-  	return new Promise((resolve, reject) => {
-	  	const image = new Image();
-	  	image.crossOrigin = 'Anonymous';
-	  	image.src = src;
-	  	image.onload = () => {
-	  		ctx.drawImage(image, x, y, width, height);
-	  		resolve();
-	  	}
-		});
-  }
-
-  const dlCanvas = () => {
-  	let canvas = document.getElementById("story");
-  	let dt = canvas.toDataURL('image/png');
-  	/* Change MIME type to trick the browser to downlaod the file instead of displaying it */
-  	dt = dt.replace(/^data:image\/[^;]*/, 'data:application/octet-stream');
-
-  	/* In addition to <a>'s "download" attribute, you can define HTTP-style headers */
-  	dt = dt.replace(/^data:application\/octet-stream/, 'data:application/octet-stream;headers=Content-Disposition%3A%20attachment%3B%20filename=Canvas.png');
-  	var link = document.createElement('a');
-  	link.download = 'quarantine-wrapped.png';
-  	link.href = dt;
-  	link.click();
-  }
-
-  useEffect(() => {
-  	console.log(props.done);
-    if(props.data && props.done) {
-    	getColor();
-    }
-  }, [props.data]);
-
-  return (
-    <div className='canvas-graphic-wrapper'>
-    	<div className='graphics-wrapper'>
-      {/*<canvas id='downloadable' width='500' height='500'></canvas>*/}
-	      <canvas id='songs' width='450' height='800'></canvas>
-	      <canvas id='story' width='450' height='800'></canvas>
-	      <canvas id='artists' width='450' height='800'></canvas>
-      </div>
-    </div>
-  )
+	return (
+		<div className='canvas-graphic-wrapper'>
+			{props.done ?
+				<>
+					<div className='graphics-wrapper'>
+						<canvas id='story' width='450' height='800'></canvas>
+					</div>
+					<div className="color-selector">
+						{colorPalettes.map((pal, index) => {
+							return <div className={"color" + (index === palette ? " selected" : "")} style={{ background: pal.color }} onClick={() => setPalette(index)}></div>;
+						})}
+					</div>
+					<button onClick={dlCanvas}>Download</button>
+				</>
+				:
+				<></>
+			}
+		</div>
+	)
 }
 
 export default CanvasGraphic;
