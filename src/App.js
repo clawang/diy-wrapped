@@ -9,10 +9,11 @@ const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize"
 const RESPONSE_TYPE = "token"
 
 const initialState = {
-  tracks: Array(5).fill({name: ""}),
-  artists: Array(5).fill({name: ""}),
+  tracks: Array(5).fill({ name: "" }),
+  artists: Array(5).fill({ name: "" }),
   genre: '',
-  time: 0
+  time: 0,
+  credit: false,
 };
 
 const testState = {
@@ -83,6 +84,8 @@ function reducer(state, action) {
       return { ...state, genre: action.data };
     case 'UPDATE_TIME':
       return { ...state, time: action.data };
+    case 'UPDATE_CREDIT':
+      return { ...state, credit: action.data };
     case 'UPDATE_DATA':
       return action.data;
     default:
@@ -157,59 +160,87 @@ function App() {
     dispatch({ type: 'ADD_ARTIST', index: index, data: { name: event.target.value } });
   }
 
+  const updateCredit = (event) => {
+    dispatch({ type: 'UPDATE_CREDIT', data: event.target.checked });
+  }
+
   return (
     <div className='App'>
       {loggedIn ?
         <div className="container">
-          <div className="input-container">
-            <h2>DIY Wrapped</h2>
-            <div className="selections">
-              <h3>Top Artists</h3>
-              {/* {renderSelections(false)} */}
-              <Entity tracks={false} index={1} spotifyApi={spotifyApi} dispatch={dispatch} />
-              {
-                Array.from({ length: 4 }).map((item, index) => {
-                  return (
-                    <div className="entity-wrapper">
-                      <p className="entity-number">{index+2 + '.'}</p>
-                      <input type="text" value={data.artists[index+1].name} onChange={e => updateArtist(e, index+1)} />
-                    </div>
-                  );
-                })
-              }
+          <div className="sidebar">
+            <div className="input-container">
+              <h1 className="logo">DIY Wrapped</h1>
+              <div className="selections">
+                <h3>Top Artist and Image</h3>
+                {/* {renderSelections(false)} */}
+                <Entity tracks={false} index={1} spotifyApi={spotifyApi} dispatch={dispatch} />
+              </div>
+              <div className="selections">
+                <h3>Other Top Artists</h3>
+                {
+                  Array.from({ length: 4 }).map((item, index) => {
+                    return (
+                      <div className="entity-wrapper">
+                        <p className="entity-number">{index + 2 + '.'}</p>
+                        <input
+                          type="text"
+                          value={data.artists[index + 1].name}
+                          onChange={e => updateArtist(e, index + 1)}
+                        />
+                      </div>
+                    );
+                  })
+                }
+              </div>
+              <div className="selections">
+                <h3>Top Tracks</h3>
+                {/* {renderSelections(true)} */}
+                {
+                  Array.from({ length: 5 }).map((item, index) => {
+                    return (
+                      <div className="entity-wrapper">
+                        <p className="entity-number">{index + 1 + '.'}</p>
+                        <input
+                          type="text"
+                          value={data.tracks[index].name}
+                          onChange={e => updateTrack(e, index)}
+                        />
+                      </div>
+                    );
+                  })
+                }
+              </div>
+              <div className="selections">
+                <h3>Top Genre</h3>
+                <input type="text" value={data.genre} onChange={updateGenre} />
+              </div>
+              <div className="selections">
+                <h3>Minutes Listened</h3>
+                <input type="text" value={data.time} onChange={updateTime} />
+              </div>
+              <div className="selections checkbox">
+                <input
+                  type="checkbox"
+                  checked={data.credit}
+                  onChange={updateCredit}
+                />
+                <h3>Show Spotify URL</h3>
+              </div>
+              {/* <button onClick={validate}>Create My Wrapped</button> */}
             </div>
-            <div className="selections">
-              <h3>Top Tracks</h3>
-              {/* {renderSelections(true)} */}
-              {
-                Array.from({ length: 5 }).map((item, index) => {
-                  return (
-                    <div className="entity-wrapper">
-                      <p className="entity-number">{index+1 + '.'}</p>
-                      <input type="text" value={data.tracks[index].name} onChange={e => updateTrack(e, index)} />
-                    </div>
-                  );
-                })
-              }
-            </div>
-            <div className="selections">
-              <h3>Top Genre</h3>
-              <input type="text" value={data.genre} onChange={updateGenre} />
-            </div>
-            <div className="selections">
-              <h3>Minutes Listened</h3>
-              <input type="text" value={data.time} onChange={updateTime} />
-            </div>
-            <button onClick={validate}>Create My Wrapped</button>
           </div>
           <CanvasGraphic data={data} done={done} />
         </div>
         :
         <div className="start-container">
-          <h1>DIY Wrapped</h1>
-          <a href={`${AUTH_ENDPOINT}?client_id=${process.env.REACT_APP_SPOTIFY_CLIENTID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}>
-            <button>Login to Spotify</button>
-          </a>
+          <div className="title-wrapper">
+            <h1>DIY Wrapped</h1>
+            <p>Create your own Spotify wrapped, for when your listening history isn't fit for the public eye.</p>
+            <a href={`${AUTH_ENDPOINT}?client_id=${process.env.REACT_APP_SPOTIFY_CLIENTID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}>
+              <button>Login to Spotify</button>
+            </a>
+          </div>
         </div>
       }
     </div>

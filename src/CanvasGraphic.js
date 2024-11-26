@@ -57,6 +57,13 @@ function CanvasGraphic(props) {
 		var lines = [];
 		var currentLine = words[0];
 
+		if (ctx.measureText(currentLine).width > maxWidth) {
+			let ratio = ctx.measureText(currentLine).width / text.length;
+			let removeCount = Math.ceil((ctx.measureText(currentLine).width - maxWidth) / ratio);
+			lines.push(text.substring(0, text.length - removeCount));
+			currentLine = text.substring(text.length - removeCount);
+		}
+
 		for (var i = 1; i < words.length; i++) {
 			var word = words[i];
 			var width = ctx.measureText(currentLine + " " + word).width;
@@ -98,15 +105,17 @@ function CanvasGraphic(props) {
 		ctx.scale(ratio, ratio);
 
 		const startingHeight = 108;
-		await drawImage(ctx, props.data.artists[0].images[1].url, 102, startingHeight - 22, 247, 247);
+		if (props.data?.artists?.[0]?.images) {
+			await drawImage(ctx, props.data.artists[0].images[1].url, 102, startingHeight - 22, 247, 247);
+		}
 		await drawImage(ctx, colorPalettes[palette].bg, 0, 0, w, h); //background
 
 		ctx.fillStyle = colorPalettes[palette].textColor;
 		ctx.font = `20px '${FONT_FAMILY}'`;
 
-		const maxWidth = 140;
+		const maxWidth = 130;
 		for (let i = 0; i < 5; i++) {
-			if (props.data.artists[i] && Object.keys(props.data.artists[i]).length != 0) {
+			if (props.data?.artists && props.data?.artists?.[i] && Object.keys(props.data.artists[i]).length != 0) {
 				let name = props.data.artists[i].name;
 				name = shortenString(ctx, name, maxWidth);
 				writeText(ctx, name, 55, startingHeight + 385 + i * 27.5);
@@ -115,7 +124,7 @@ function CanvasGraphic(props) {
 
 		ctx.font = `20px '${FONT_FAMILY}'`;
 		for (let i = 0; i < 5; i++) {
-			if (props.data.tracks[i]) {
+			if (props.data?.tracks?.[i]) {
 				let name = props.data.tracks[i].name;
 				name = shortenString(ctx, name, maxWidth);
 				writeText(ctx, name, 260, startingHeight + 385 + i * 27.5);
@@ -141,6 +150,15 @@ function CanvasGraphic(props) {
 			let time = props.data.time;
 			ctx.font = `30px '${FONT_FAMILY}'`;
 			writeText(ctx, time, 30, startingHeight + 580);
+		}
+
+		if (!props.data.credit) {
+			ctx.fillStyle = colorPalettes[palette].color;
+			ctx.rect(220, startingHeight + 640, 300, 40);
+			ctx.fill();
+			ctx.fillStyle = colorPalettes[palette].textColor;
+			ctx.font = `17px '${FONT_FAMILY}'`;
+			writeText(ctx, "DIYWRAPPED.COM", 260, startingHeight + 662);
 		}
 	}
 
@@ -175,28 +193,20 @@ function CanvasGraphic(props) {
 	}
 
 	useEffect(() => {
-		if (props.data && props.done) {
-			drawStoryCanvas();
-		}
-	}, [props.done, palette]);
+		drawStoryCanvas();
+	}, [props.done, props.data, palette]);
 
 	return (
 		<div className='canvas-graphic-wrapper'>
-			{props.done ?
-				<>
-					<div className='graphics-wrapper'>
-						<canvas id='story' width='450' height='800'></canvas>
-					</div>
-					<div className="color-selector">
-						{colorPalettes.map((pal, index) => {
-							return <div className={"color" + (index === palette ? " selected" : "")} style={{ background: pal.color }} onClick={() => setPalette(index)}></div>;
-						})}
-					</div>
-					<button onClick={dlCanvas}>Download</button>
-				</>
-				:
-				<></>
-			}
+			<div className='graphics-wrapper'>
+				<canvas id='story' width='450' height='800'></canvas>
+			</div>
+			<div className="color-selector">
+				{colorPalettes.map((pal, index) => {
+					return <div className={"color" + (index === palette ? " selected" : "")} style={{ background: pal.color }} onClick={() => setPalette(index)}></div>;
+				})}
+			</div>
+			<button onClick={dlCanvas}>Download</button>
 		</div>
 	)
 }

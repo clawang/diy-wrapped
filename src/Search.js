@@ -31,31 +31,34 @@ function Search(props) {
 	}
 
 	return (
-		<div className="search">
-			<form className="search-form">
-				<div className="search-bar-wrapper">
-					<input type="text" value={query} placeholder={"Search " + (props.tracks ? "a track" : "an artist")} onChange={handleChange} />
-					{
-						results.length > 0 ?
+		<div className="top-artist">
+			<p className="entity-number">{props.index + '.'}</p>
+			<div className="search">
+				<form className="search-form">
+					<div className="search-bar-wrapper">
+						<input type="text" value={query} placeholder={"Search " + (props.tracks ? "a track" : "an artist")} onChange={handleChange} />
+
+					</div>
+					<button onClick={handleSubmit}>
+						<img src="./search.png" />
+					</button>
+				</form>
+			</div>
+			{
+				results.length > 0 ?
+					<div className="results">
+						{results.map(track => props.tracks ? <SearchTrackResult data={track} setEntityData={props.setData} /> : <SearchArtistResult data={track} setEntityData={props.setData} />)}
+					</div>
+					:
+					(
+						searched ?
 							<div className="results">
-								{results.map(track => props.tracks ? <SearchTrackResult data={track} setEntityData={props.setData} /> : <SearchArtistResult data={track} setEntityData={props.setData} />)}
+								<p>There were no results for your query.</p>
 							</div>
 							:
-							(
-								searched ?
-									<div className="results">
-										<p>There were no results for your query.</p>
-									</div>
-									:
-									<></>
-							)
-					}
-				</div>
-				<button onClick={handleSubmit}>
-					<img src="./search.png" />
-				</button>
-			</form>
-
+							<></>
+					)
+			}
 		</div>
 	);
 }
