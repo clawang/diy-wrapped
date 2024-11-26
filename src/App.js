@@ -4,7 +4,7 @@ import SpotifyWebApi from 'spotify-web-api-js';
 import CanvasGraphic from './CanvasGraphic';
 import Entity from './Entity';
 
-const REDIRECT_URI = "http://localhost:3000/"
+const REDIRECT_URI = "https://diy-wrapped.netlify.app/" || "http://localhost:3000/";
 const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize"
 const RESPONSE_TYPE = "token"
 
