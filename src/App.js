@@ -241,6 +241,9 @@ function App() {
               <button>Login to Spotify</button>
             </a>
           </div>
+          <div className="credit">
+            <p>Made by <a href="https://clawang.github.io/" target="_blank">Claire Wang</a>. Not affiliated with Spotify.</p>
+          </div>
         </div>
       }
     </div>

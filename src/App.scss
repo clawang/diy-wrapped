@@ -129,10 +129,13 @@ input[type="text"] {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   padding: 100px 0;
+  height: calc(100vh - 80px);
 }
 
 .title-wrapper {
+  width: 100%;
   max-width: 500px;
   border-radius: 50%;
   border: 1px dashed black;
@@ -175,6 +178,12 @@ input[type="text"] {
     border-radius: 50%;
     z-index: -1;
   }
+}
+
+.credit {
+  position: absolute;
+  bottom: 10px;
+  font-family: Editorial New, serif;
 }
 
 .container {
@@ -483,5 +492,26 @@ input[type="text"] {
 
   .canvas-graphic-wrapper {
     width: 100%;
+  }
+
+  .start-container {
+    padding: 50px 20px;
+  }
+
+  .title-wrapper {
+    padding: 20%;
+
+    h1 {
+      font-size: 40px;
+      line-height: 40px;
+    }
+
+    p {
+      font-size: 20px;
+    }
+
+    button {
+      font-size: 14px;
+    }
   }
 }
