@@ -93,6 +93,7 @@ function CanvasGraphic(props) {
 	}
 
 	const drawStoryCanvas = async () => {
+		await loadFonts();
 		let ratio = window.devicePixelRatio;
 		const w = 450;
 		const h = 800;
@@ -113,12 +114,15 @@ function CanvasGraphic(props) {
 		ctx.fillStyle = colorPalettes[palette].textColor;
 		ctx.font = `20px '${FONT_FAMILY}'`;
 
-		const maxWidth = 130;
+		const maxWidth = 165;
 		for (let i = 0; i < 5; i++) {
+			// ctx.rect(55, startingHeight + 385, 170, 130);
+			// ctx.stroke();
 			if (props.data?.artists && props.data?.artists?.[i] && Object.keys(props.data.artists[i]).length != 0) {
 				let name = props.data.artists[i].name;
 				name = shortenString(ctx, name, maxWidth);
 				writeText(ctx, name, 55, startingHeight + 385 + i * 27.5);
+				
 			}
 		}
 
@@ -131,15 +135,16 @@ function CanvasGraphic(props) {
 			}
 		}
 
+		const genreMaxWidth = 150;
 		if (props.data.genre) {
 			let g = props.data.genre;
 			let topGenre = g.charAt(0).toUpperCase() + g.slice(1);
-			const lines = getLines(ctx, topGenre, maxWidth);
+			const lines = getLines(ctx, topGenre, genreMaxWidth);
 			ctx.font = `30px '${FONT_FAMILY}'`;
 			for (let i = 0; i < 2; i++) {
 				if (i > lines.length - 1) break;
 				if (i === 1) {
-					writeText(ctx, shortenString(ctx, lines[i], maxWidth), 240, startingHeight + (580 + i * 42));
+					writeText(ctx, shortenString(ctx, lines[i], genreMaxWidth), 240, startingHeight + (580 + i * 42));
 				} else {
 					writeText(ctx, lines[i], 240, startingHeight + (580 + i * 42));
 				}
@@ -154,7 +159,7 @@ function CanvasGraphic(props) {
 
 		if (!props.data.credit) {
 			ctx.fillStyle = colorPalettes[palette].color;
-			ctx.rect(220, startingHeight + 640, 300, 40);
+			ctx.rect(210, startingHeight + 640, 300, 40);
 			ctx.fill();
 			ctx.fillStyle = colorPalettes[palette].textColor;
 			ctx.font = `17px '${FONT_FAMILY}'`;
@@ -191,6 +196,17 @@ function CanvasGraphic(props) {
 		link.href = dt;
 		link.click();
 	}
+
+	const loadFonts = async () => {	  
+		const font2 = new FontFace("Circular Spotify", "url('Circular Bold.ttf')", {
+		  style: "normal",
+		  weight: "400",
+		});
+		// wait for font to be loaded
+		await font2.load();
+		// add font to document
+		document.fonts.add(font2);
+	  }
 
 	useEffect(() => {
 		drawStoryCanvas();
