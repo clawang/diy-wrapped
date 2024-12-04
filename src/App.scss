@@ -406,10 +406,11 @@ input[type="text"] {
   text-align: left;
   display: flex;
   align-items: center;
-  justify-content: center;
   flex-direction: column;
   width: 50%;
   padding: 20px;
+  max-height: 100vh;
+  overflow-y: scroll;
 
   .graphics-wrapper {
     display: flex;
@@ -428,8 +429,8 @@ input[type="text"] {
 
   canvas {
     position: static;
-    width: 300px;
-    height: 533px;
+    width: 255px;
+    height: 444px;
     margin: 0 10px;
     float: right;
   }
@@ -445,6 +446,7 @@ input[type="text"] {
 
   button {
     font-size: 14px;
+    margin: 5px 0;
   }
 }
 
@@ -496,6 +498,7 @@ input[type="text"] {
 
   .canvas-graphic-wrapper {
     width: 100%;
+    max-height: none;
   }
 
   .start-container {
