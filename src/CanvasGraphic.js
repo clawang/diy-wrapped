@@ -30,6 +30,8 @@ const yellow2024 = 'rgb(254, 241, 2)';
 const blue2024 = 'rgb(0,173,241)';
 const red2024 = 'rgb(233,27,3)';
 
+let timer;
+
 const colorPalettes = [
 	{
 		textColor: white,
@@ -153,6 +155,7 @@ function CanvasGraphic(props) {
 		// cv.style.width = w + "px";
 		// cv.style.height = h + "px";
 		const ctx = cv.getContext("2d");
+		ctx.reset();
 		ctx.scale(ratio, ratio);
 
 		ctx.clearRect(0, 0, w, h);
@@ -225,7 +228,6 @@ function CanvasGraphic(props) {
 			ctx.letterSpacing = "0px";
 			writeText(ctx, "DIYWRAPPED.COM", 255, startingHeight + creditHeight + 21);
 		}
-		ctx.scale(ratio, ratio);
 	}
 
 	const writeText = (ctx, words, x, y) => {
@@ -276,8 +278,17 @@ function CanvasGraphic(props) {
 		document.fonts.add(font2);
 	}
 
+	const debouncedDraw = () => {
+		if (!timer) {
+			timer = setTimeout(() => {
+				drawStoryCanvas();
+				timer = null;
+			}, 100);
+		}
+	}
+
 	useEffect(() => {
-		drawStoryCanvas();
+		debouncedDraw();
 	}, [props.done, props.data, palette]);
 
 	return (
