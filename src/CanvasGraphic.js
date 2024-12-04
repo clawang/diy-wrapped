@@ -155,6 +155,8 @@ function CanvasGraphic(props) {
 		const ctx = cv.getContext("2d");
 		ctx.scale(ratio, ratio);
 
+		ctx.clearRect(0, 0, w, h);
+
 		const startingHeight = 94;
 		if (props.data?.artists?.[0]?.images) {
 			await drawImage(ctx, props.data.artists[0].images[1].url, 95, startingHeight - 17, 260, 260);
@@ -223,6 +225,7 @@ function CanvasGraphic(props) {
 			ctx.letterSpacing = "0px";
 			writeText(ctx, "DIYWRAPPED.COM", 255, startingHeight + creditHeight + 21);
 		}
+		ctx.scale(ratio, ratio);
 	}
 
 	const writeText = (ctx, words, x, y) => {
