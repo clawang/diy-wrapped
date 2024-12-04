@@ -402,6 +402,13 @@ input[type="text"] {
   display: none;
 }
 
+.scrollable {
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .canvas-graphic-wrapper {
   text-align: left;
   display: flex;
@@ -410,7 +417,7 @@ input[type="text"] {
   width: 50%;
   padding: 20px;
   max-height: 100vh;
-  overflow-y: scroll;
+  justify-content: center;
 
   .graphics-wrapper {
     display: flex;
@@ -429,10 +436,9 @@ input[type="text"] {
 
   canvas {
     position: static;
-    width: 255px;
-    height: 444px;
+    width: 300px;
+    height: 533px;
     margin: 0 10px;
-    float: right;
   }
 
   h1 {

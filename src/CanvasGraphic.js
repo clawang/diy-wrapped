@@ -282,27 +282,29 @@ function CanvasGraphic(props) {
 
 	return (
 		<div className='canvas-graphic-wrapper'>
-			<div className='graphics-wrapper'>
-				<canvas id='story' width='450' height='800'></canvas>
+			<div className="scrollable">
+				<div className='graphics-wrapper'>
+					<canvas id='story' width='450' height='800'></canvas>
+				</div>
+				<div className="color-selector">
+					{colorPalettes.map((pal, index) => {
+						return (
+							<div
+								className={"color" + (index === palette ? " selected" : "")}
+								style={{ background: pal.color }}
+								onClick={() => setPalette(index)}
+							>
+								{
+									pal.thumbnail ?
+										<img src={pal.thumbnail} />
+										:
+										<></>
+								}
+							</div>);
+					})}
+				</div>
+				<button onClick={dlCanvas}>Download</button>
 			</div>
-			<div className="color-selector">
-				{colorPalettes.map((pal, index) => {
-					return (
-						<div
-							className={"color" + (index === palette ? " selected" : "")}
-							style={{ background: pal.color }}
-							onClick={() => setPalette(index)}
-						>
-							{
-								pal.thumbnail ? 
-								<img src={pal.thumbnail} />
-								:
-								<></>
-							}
-						</div>);
-				})}
-			</div>
-			<button onClick={dlCanvas}>Download</button>
 		</div>
 	)
 }
