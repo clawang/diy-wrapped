@@ -24,7 +24,7 @@ const red = 'rgb(254, 91, 72)';
 const dark = 'rgb(1,1,1)';
 const green = 'rgb(22,209,166)';
 const white = 'rgb(255,255,255)';
-const black = 'rgba(0,0,0,0.9)';
+const black = 'rgba(0,0,0,1)';
 
 const yellow2024 = 'rgb(254, 241, 2)';
 const blue2024 = 'rgb(0,173,241)';
