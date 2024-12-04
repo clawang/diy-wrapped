@@ -228,6 +228,8 @@ function CanvasGraphic(props) {
 			ctx.letterSpacing = "0px";
 			writeText(ctx, "DIYWRAPPED.COM", 255, startingHeight + creditHeight + 21);
 		}
+
+		ctx.resetTransform();
 	}
 
 	const writeText = (ctx, words, x, y) => {
@@ -283,7 +285,7 @@ function CanvasGraphic(props) {
 			timer = setTimeout(() => {
 				drawStoryCanvas();
 				timer = null;
-			}, 100);
+			}, 150);
 		}
 	}
 
