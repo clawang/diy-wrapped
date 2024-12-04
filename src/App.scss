@@ -470,6 +470,10 @@ input[type="text"] {
     &.selected {
       border: 1px solid black;
     }
+
+    img {
+      width: 100%;
+    }
   }
 }
 

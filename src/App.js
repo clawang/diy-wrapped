@@ -211,10 +211,10 @@ function App() {
                   })
                 }
               </div>
-              <div className="selections">
+              {/* <div className="selections">
                 <h3>Top Genre</h3>
                 <input type="text" value={data.genre} onChange={updateGenre} />
-              </div>
+              </div> */}
               <div className="selections">
                 <h3>Minutes Listened</h3>
                 <input type="text" value={data.time} onChange={updateTime} />

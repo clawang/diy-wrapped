@@ -5,6 +5,16 @@ import bgYellow from './assets/2023-yellow.png';
 import bgRed from './assets/2023-red.png';
 import bgBlack from './assets/2023-black.png';
 import bgGreen from './assets/2023-green.png';
+import bgYellowBlue from './assets/yellow-blue.png';
+import bgBlueRed from './assets/blue-red.png';
+import bgRedGreen from './assets/red-green.png';
+import bgBlackRed from './assets/black-red.png';
+import bgBlackGreen from './assets/black-green.png';
+import bgBlackBlue from './assets/black-blue.png';
+import thumbnailBlackBlue from './assets/black-blue-thumbnail.png';
+import thumbnailBlackRed from './assets/black-red-thumbnail.png';
+import thumbnailBlackGreen from './assets/black-green-thumbnail.png';
+import template from './assets/template.png';
 
 const FONT_FAMILY = 'Circular Spotify';
 const purple = 'rgb(65,0,118)';
@@ -16,7 +26,47 @@ const green = 'rgb(22,209,166)';
 const white = 'rgb(255,255,255)';
 const black = 'rgba(0,0,0,0.9)';
 
+const yellow2024 = 'rgb(254, 241, 2)';
+const blue2024 = 'rgb(0,173,241)';
+const red2024 = 'rgb(233,27,3)';
+
 const colorPalettes = [
+	{
+		textColor: white,
+		bg: bgBlackGreen,
+		color: black,
+		thumbnail: thumbnailBlackGreen
+	},
+	{
+		textColor: white,
+		bg: bgBlackBlue,
+		color: black,
+		thumbnail: thumbnailBlackBlue
+	},
+	{
+		textColor: white,
+		bg: bgBlackRed,
+		color: black,
+		thumbnail: thumbnailBlackRed
+	},
+	{
+		textColor: black,
+		bg: bgYellowBlue,
+		color: yellow2024
+	},
+	{
+		textColor: black,
+		bg: bgBlueRed,
+		color: blue2024
+	},
+	{
+		textColor: black,
+		bg: bgRedGreen,
+		color: red2024
+	},
+];
+
+const colorPalettes2023 = [
 	{
 		textColor: black,
 		bg: bgLavender,
@@ -105,65 +155,73 @@ function CanvasGraphic(props) {
 		const ctx = cv.getContext("2d");
 		ctx.scale(ratio, ratio);
 
-		const startingHeight = 108;
+		const startingHeight = 94;
 		if (props.data?.artists?.[0]?.images) {
-			await drawImage(ctx, props.data.artists[0].images[1].url, 102, startingHeight - 22, 247, 247);
+			await drawImage(ctx, props.data.artists[0].images[1].url, 95, startingHeight - 17, 260, 260);
 		}
 		await drawImage(ctx, colorPalettes[palette].bg, 0, 0, w, h); //background
+		// await drawImage(ctx, template, 0, 0, w, h);
 
+		const maxWidth = 170;
+		const fontSize = 20;
+		const lineHeight = 21.5;
 		ctx.fillStyle = colorPalettes[palette].textColor;
-		ctx.font = `20px '${FONT_FAMILY}'`;
+		ctx.font = `${fontSize}px '${FONT_FAMILY}'`;
+		ctx.letterSpacing = "-1.1px";
+		ctx.scale(0.948, 1);
 
-		const maxWidth = 165;
 		for (let i = 0; i < 5; i++) {
 			// ctx.rect(55, startingHeight + 385, 170, 130);
 			// ctx.stroke();
 			if (props.data?.artists && props.data?.artists?.[i] && Object.keys(props.data.artists[i]).length != 0) {
 				let name = props.data.artists[i].name;
 				name = shortenString(ctx, name, maxWidth);
-				writeText(ctx, name, 55, startingHeight + 385 + i * 27.5);
-				
+				writeText(ctx, name, 53, startingHeight + 385 + i * lineHeight);
+
 			}
 		}
 
-		ctx.font = `20px '${FONT_FAMILY}'`;
+		ctx.font = `${fontSize}px '${FONT_FAMILY}'`;
 		for (let i = 0; i < 5; i++) {
 			if (props.data?.tracks?.[i]) {
 				let name = props.data.tracks[i].name;
 				name = shortenString(ctx, name, maxWidth);
-				writeText(ctx, name, 260, startingHeight + 385 + i * 27.5);
+				writeText(ctx, name, 266, startingHeight + 385 + i * lineHeight);
 			}
 		}
 
-		const genreMaxWidth = 150;
-		if (props.data.genre) {
-			let g = props.data.genre;
-			let topGenre = g.charAt(0).toUpperCase() + g.slice(1);
-			const lines = getLines(ctx, topGenre, genreMaxWidth);
-			ctx.font = `30px '${FONT_FAMILY}'`;
-			for (let i = 0; i < 2; i++) {
-				if (i > lines.length - 1) break;
-				if (i === 1) {
-					writeText(ctx, shortenString(ctx, lines[i], genreMaxWidth), 240, startingHeight + (580 + i * 42));
-				} else {
-					writeText(ctx, lines[i], 240, startingHeight + (580 + i * 42));
-				}
-			}
-		}
+		// const genreMaxWidth = 150;
+		// if (props.data.genre) {
+		// 	let g = props.data.genre;
+		// 	let topGenre = g.charAt(0).toUpperCase() + g.slice(1);
+		// 	const lines = getLines(ctx, topGenre, genreMaxWidth);
+		// 	ctx.font = `42px '${FONT_FAMILY}'`;
+		// 	for (let i = 0; i < 2; i++) {
+		// 		if (i > lines.length - 1) break;
+		// 		if (i === 1) {
+		// 			writeText(ctx, shortenString(ctx, lines[i], genreMaxWidth), 240, startingHeight + (580 + i * 42));
+		// 		} else {
+		// 			writeText(ctx, lines[i], 240, startingHeight + (580 + i * 42));
+		// 		}
+		// 	}
+		// }
 
 		if (props.data.time) {
 			let time = props.data.time;
-			ctx.font = `30px '${FONT_FAMILY}'`;
-			writeText(ctx, time, 30, startingHeight + 580);
+			ctx.font = `42px 'Spotify Mix Black'`;
+			ctx.letterSpacing = "-1.5px";
+			writeText(ctx, time, 34, startingHeight + 571);
 		}
 
+		const creditHeight = 657;
 		if (!props.data.credit) {
 			ctx.fillStyle = colorPalettes[palette].color;
-			ctx.rect(210, startingHeight + 640, 300, 40);
+			ctx.rect(180, startingHeight + creditHeight, 270, 30);
 			ctx.fill();
 			ctx.fillStyle = colorPalettes[palette].textColor;
-			ctx.font = `17px '${FONT_FAMILY}'`;
-			writeText(ctx, "DIYWRAPPED.COM", 260, startingHeight + 662);
+			ctx.font = `20px ${FONT_FAMILY}`;
+			ctx.letterSpacing = "0px";
+			writeText(ctx, "DIYWRAPPED.COM", 255, startingHeight + creditHeight + 21);
 		}
 	}
 
@@ -197,16 +255,23 @@ function CanvasGraphic(props) {
 		link.click();
 	}
 
-	const loadFonts = async () => {	  
-		const font2 = new FontFace("Circular Spotify", "url('Circular Bold.ttf')", {
-		  style: "normal",
-		  weight: "400",
+	const loadFonts = async () => {
+		const font1 = new FontFace("Spotify Mix Black", "url('SpotifyMix-ExtraBold.ttf')", {
+			style: "normal",
+			weight: "300",
+		});
+		const font2 = new FontFace("Circular Spotify", "url('SpotifyMix-Bold.ttf')", {
+			style: "normal",
+			weight: "400",
+			stretch: "50% 200%"
 		});
 		// wait for font to be loaded
+		await font1.load();
 		await font2.load();
 		// add font to document
+		document.fonts.add(font1);
 		document.fonts.add(font2);
-	  }
+	}
 
 	useEffect(() => {
 		drawStoryCanvas();
@@ -219,7 +284,19 @@ function CanvasGraphic(props) {
 			</div>
 			<div className="color-selector">
 				{colorPalettes.map((pal, index) => {
-					return <div className={"color" + (index === palette ? " selected" : "")} style={{ background: pal.color }} onClick={() => setPalette(index)}></div>;
+					return (
+						<div
+							className={"color" + (index === palette ? " selected" : "")}
+							style={{ background: pal.color }}
+							onClick={() => setPalette(index)}
+						>
+							{
+								pal.thumbnail ? 
+								<img src={pal.thumbnail} />
+								:
+								<></>
+							}
+						</div>);
 				})}
 			</div>
 			<button onClick={dlCanvas}>Download</button>
