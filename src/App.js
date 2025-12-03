@@ -1,12 +1,14 @@
-import React, { useEffect, useState, useReducer } from 'react';
+import React, { useEffect, useState, useReducer, useRef } from 'react';
+import { generateRandomString, sha256, base64encode } from './auth';
 import './App.scss';
 import SpotifyWebApi from 'spotify-web-api-js';
 import CanvasGraphic from './CanvasGraphic';
 import Entity from './Entity';
 
-const REDIRECT_URI = "https://diy-wrapped.netlify.app/" || "http://localhost:3000/";
+const REDIRECT_URI =
+  "https://diy-wrapped.netlify.app/" || 
+  "http://127.0.0.1:3000/callback";
 const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize"
-const RESPONSE_TYPE = "token"
 
 const initialState = {
   tracks: Array(5).fill({ name: "" }),
@@ -101,28 +103,89 @@ function App() {
 
   const spotifyApi = new SpotifyWebApi();
 
-  const getHashParams = () => {
-    var hashParams = {};
-    var e, r = /([^&;=]+)=?([^&;]*)/g,
-      q = window.location.hash.substring(1);
-    e = r.exec(q)
-    while (e) {
-      hashParams[e[1]] = decodeURIComponent(e[2]);
-      e = r.exec(q);
+  const token = useRef({
+    access_token: null,
+    refresh_token: null,
+    expires_in: null
+  });
+
+  const getSpotifyAuth = async () => {
+    // create codeVerifier
+    const codeVerifier = generateRandomString(64);
+    window.localStorage.setItem('code_verifier', codeVerifier);
+
+    // create codeChallenge
+    const hashed = await sha256(codeVerifier)
+    const codeChallenge = base64encode(hashed);
+
+    const scope = 'user-read-private user-read-email';
+    const params = {
+      response_type: 'code',
+      client_id: process.env.REACT_APP_SPOTIFY_CLIENTID,
+      scope,
+      code_challenge_method: 'S256',
+      code_challenge: codeChallenge,
+      redirect_uri: REDIRECT_URI
     }
-    return hashParams;
+
+    const authUrl = new URL(AUTH_ENDPOINT);
+    authUrl.search = new URLSearchParams(params).toString();
+    window.location.href = authUrl.toString();
+  };
+
+  const getToken = async code => {
+    // stored in the previous step
+    const codeVerifier = localStorage.getItem('code_verifier');
+
+    const url = "https://accounts.spotify.com/api/token";
+    const payload = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        client_id: process.env.REACT_APP_SPOTIFY_CLIENTID,
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: REDIRECT_URI,
+        code_verifier: codeVerifier,
+      }),
+    }
+
+    const body = await fetch(url, payload);
+    const response = await body.json();
+
+    return response;
+  }
+
+  const setAccessToken = async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    let code = urlParams.get('code');
+
+    if (code) {
+      const response = await getToken(code);
+      const { access_token, refresh_token, expires_in } = response;
+      token.current = {
+        access_token, refresh_token, expires_in
+      };
+      setLoggedIn(access_token ? true : false);
+      spotifyApi.setAccessToken(access_token);
+
+      const url = new URL(window.location.href);
+      url.searchParams.delete("code");
+
+      const updatedUrl = url.search ? url.href : url.href.replace('?', '');
+      window.history.replaceState({}, document.title, updatedUrl);
+    }
+  }
+
+  const logOut = () => {
+    setLoggedIn(false);
   }
 
   useEffect(() => {
-    const params = getHashParams();
-    const token = params.access_token;
-    if (token) {
-      spotifyApi.setAccessToken(token);
-      setLoggedIn(true);
-    }
-    // dispatch({ type: 'UPDATE_DATA', data: testState });
-    // setDone(true);
-  }, [setDone]);
+    setAccessToken();
+  }, []);
 
   const validate = (evt) => {
     let allFilled = true;
@@ -211,10 +274,10 @@ function App() {
                   })
                 }
               </div>
-              {/* <div className="selections">
+              <div className="selections">
                 <h3>Top Genre</h3>
                 <input type="text" value={data.genre} onChange={updateGenre} />
-              </div> */}
+              </div>
               <div className="selections">
                 <h3>Minutes Listened</h3>
                 <input type="text" value={data.time} onChange={updateTime} />
@@ -237,9 +300,7 @@ function App() {
           <div className="title-wrapper">
             <h1>DIY Wrapped</h1>
             <p>Create your own Spotify wrapped, for when your listening history isn't fit for the public eye.</p>
-            <a href={`${AUTH_ENDPOINT}?client_id=${process.env.REACT_APP_SPOTIFY_CLIENTID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}>
-              <button>Login to Spotify</button>
-            </a>
+            <button onClick={getSpotifyAuth}>Login to Spotify</button>
           </div>
           <div className="credit">
             <p>Made by <a href="https://clawang.github.io/" target="_blank">Claire Wang</a>. Not affiliated with Spotify.</p>

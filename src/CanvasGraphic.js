@@ -14,7 +14,15 @@ import bgBlackBlue from './assets/black-blue.png';
 import thumbnailBlackBlue from './assets/black-blue-thumbnail.png';
 import thumbnailBlackRed from './assets/black-red-thumbnail.png';
 import thumbnailBlackGreen from './assets/black-green-thumbnail.png';
-import template from './assets/template.png';
+import bgWhiteRed from './assets/2025-white-red.png';
+import bgWhiteYellow from './assets/2025-white-yellow.png';
+import bgBlackPurple from './assets/2025-black-purple.png';
+import bgBlackGreen2025 from './assets/2025-black-green.png';
+import thumbnailBlackPurple from './assets/black-purple-thumbnail.png';
+import thumbnailBlackGreen2025 from './assets/black-green-thumbnail-2025.png';
+import thumbnailWhiteRed from './assets/white-red-thumbnail.png';
+import thumbnailWhiteYellow from './assets/white-yellow-thumbnail.png';
+import template from './assets/template.JPG';
 
 const FONT_FAMILY = 'Circular Spotify';
 const purple = 'rgb(65,0,118)';
@@ -30,9 +38,40 @@ const yellow2024 = 'rgb(254, 241, 2)';
 const blue2024 = 'rgb(0,173,241)';
 const red2024 = 'rgb(233,27,3)';
 
+const black2025 = '#272727';
+const white2025 = '#e4e5df';
+const whiteBg2025 = '#eeefea';
+
 let timer;
 
-const colorPalettes = [
+const colorPalettes2025 = [
+	{
+		textColor: black2025,
+		bg: bgWhiteRed,
+		color: whiteBg2025,
+		thumbnail: thumbnailWhiteRed
+	},
+	{
+		textColor: black2025,
+		bg: bgWhiteYellow,
+		color: whiteBg2025,
+		thumbnail: thumbnailWhiteYellow
+	},
+	{
+		textColor: white2025,
+		bg: bgBlackPurple,
+		color: black2025,
+		thumbnail: thumbnailBlackPurple
+	},
+	{
+		textColor: white2025,
+		bg: bgBlackGreen2025,
+		color: black2025,
+		thumbnail: thumbnailBlackGreen2025
+	},
+];
+
+const colorPalettes2024 = [
 	{
 		textColor: white,
 		bg: bgBlackGreen,
@@ -160,19 +199,21 @@ function CanvasGraphic(props) {
 
 		ctx.clearRect(0, 0, w, h);
 
-		const startingHeight = 94;
-		if (props.data?.artists?.[0]?.images) {
-			await drawImage(ctx, props.data.artists[0].images[1].url, 95, startingHeight - 17, 260, 260);
-		}
-		await drawImage(ctx, colorPalettes[palette].bg, 0, 0, w, h); //background
 		// await drawImage(ctx, template, 0, 0, w, h);
+
+		const startingHeight = 61;
+		if (props.data?.artists?.[0]?.images) {
+			await drawImage(ctx, props.data.artists[0].images[1].url, 91, startingHeight - 30, 318, 318);
+		}
+		await drawImage(ctx, colorPalettes2025[palette].bg, 0, 0, w, h); //background
+		
 
 		const maxWidth = 170;
 		const fontSize = 20;
-		const lineHeight = 21.5;
-		ctx.fillStyle = colorPalettes[palette].textColor;
+		const lineHeight = 27.5;
+		ctx.fillStyle = colorPalettes2025[palette].textColor;
 		ctx.font = `${fontSize}px '${FONT_FAMILY}'`;
-		ctx.letterSpacing = "-1.1px";
+		ctx.letterSpacing = "0.3px";
 		ctx.scale(0.948, 1);
 
 		for (let i = 0; i < 5; i++) {
@@ -181,7 +222,7 @@ function CanvasGraphic(props) {
 			if (props.data?.artists && props.data?.artists?.[i] && Object.keys(props.data.artists[i]).length != 0) {
 				let name = props.data.artists[i].name;
 				name = shortenString(ctx, name, maxWidth);
-				writeText(ctx, name, 53, startingHeight + 385 + i * lineHeight);
+				writeText(ctx, name, 55, startingHeight + 385 + i * lineHeight);
 
 			}
 		}
@@ -191,39 +232,40 @@ function CanvasGraphic(props) {
 			if (props.data?.tracks?.[i]) {
 				let name = props.data.tracks[i].name;
 				name = shortenString(ctx, name, maxWidth);
-				writeText(ctx, name, 266, startingHeight + 385 + i * lineHeight);
+				writeText(ctx, name, 268, startingHeight + 385 + i * lineHeight);
 			}
 		}
 
-		// const genreMaxWidth = 150;
-		// if (props.data.genre) {
-		// 	let g = props.data.genre;
-		// 	let topGenre = g.charAt(0).toUpperCase() + g.slice(1);
-		// 	const lines = getLines(ctx, topGenre, genreMaxWidth);
-		// 	ctx.font = `42px '${FONT_FAMILY}'`;
-		// 	for (let i = 0; i < 2; i++) {
-		// 		if (i > lines.length - 1) break;
-		// 		if (i === 1) {
-		// 			writeText(ctx, shortenString(ctx, lines[i], genreMaxWidth), 240, startingHeight + (580 + i * 42));
-		// 		} else {
-		// 			writeText(ctx, lines[i], 240, startingHeight + (580 + i * 42));
-		// 		}
-		// 	}
-		// }
+		const genreMaxWidth = 130;
+		if (props.data.genre) {
+			let g = props.data.genre;
+			let topGenre = g.charAt(0).toUpperCase() + g.slice(1);
+			const lines = getLines(ctx, topGenre, genreMaxWidth);
+			ctx.font = `36px 'Spotify Mix Black'`;
+			ctx.letterSpacing = "-0.5px";
+			for (let i = 0; i < 2; i++) {
+				if (i > lines.length - 1) break;
+				if (i === 1) {
+					writeText(ctx, shortenString(ctx, lines[i], genreMaxWidth), 247, startingHeight + (587 + i * 36));
+				} else {
+					writeText(ctx, lines[i], 247, startingHeight + (587 + i * 36));
+				}
+			}
+		}
 
 		if (props.data.time) {
 			let time = props.data.time;
-			ctx.font = `42px 'Spotify Mix Black'`;
-			ctx.letterSpacing = "-1.5px";
-			writeText(ctx, time, 34, startingHeight + 571);
+			ctx.font = `36px 'Spotify Mix Black'`;
+			ctx.letterSpacing = "0.5px";
+			writeText(ctx, time, 34, startingHeight + 587);
 		}
 
-		const creditHeight = 657;
+		const creditHeight = 687;
 		if (!props.data.credit) {
-			ctx.fillStyle = colorPalettes[palette].color;
+			ctx.fillStyle = colorPalettes2025[palette].color;
 			ctx.rect(180, startingHeight + creditHeight, 270, 30);
 			ctx.fill();
-			ctx.fillStyle = colorPalettes[palette].textColor;
+			ctx.fillStyle = colorPalettes2025[palette].textColor;
 			ctx.font = `20px ${FONT_FAMILY}`;
 			ctx.letterSpacing = "0px";
 			writeText(ctx, "DIYWRAPPED.COM", 255, startingHeight + creditHeight + 21);
@@ -300,7 +342,7 @@ function CanvasGraphic(props) {
 					<canvas id='story' width='450' height='800'></canvas>
 				</div>
 				<div className="color-selector">
-					{colorPalettes.map((pal, index) => {
+					{colorPalettes2025.map((pal, index) => {
 						return (
 							<div
 								className={"color" + (index === palette ? " selected" : "")}
